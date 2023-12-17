@@ -1,28 +1,18 @@
-# 安装 zsh
-sudo apt-get install zsh -y
-# 设置 zsh 为默认 shell, 需求输入密码, 所以注释掉
-# echo "setting zsh as default shell ..."
-# chsh -ls /bin/zsh
+# Description: install oh-my-zsh and plugins
 
-# 安装 oh-my-zsh, 并且 输入 Y
-if [ -d ~/.oh-my-zsh ]; then
-    echo "oh-my-zsh is already installed."
-    echo "if you want to reinstall it, please enter Y."
-
-    read -r -p "Do you want to reinstall oh-my-zsh? [Y/n] " answer
-    if [ -z "$answer" ] || [ "$answer" != "${answer#[Yy]}" ]; then
-        echo "reinstalling oh-my-zsh ..."
-        rm -rf ~/.oh-my-zsh
-        rm -rf ~/.zshrc
-        # next step
-    else
-        echo "exiting ..."
-        exit 0
-    fi
+# 检查是否安装了 zsh
+if [ ! -x "$(command -v zsh)" ]; then
+    echo "zsh not found, please install zsh first."
+    exit 1
 fi
 
-echo "installing oh-my-zsh ... if it takes too long, you can press Ctrl+C to stop it."
-echo "Y" | sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# 检查是不是ubuntu 或者 debian
+if [ ! -x "$(command -v apt-get)" ]; then
+    echo "only support ubuntu or debian."
+    exit 1
+fi
+
+echo "installing oh-my-zsh plugins ... if it takes too long, you can press Ctrl+C to stop it."
 
 # oh-my-zsh 插件
 # syntax-highlighting 高亮
@@ -51,15 +41,4 @@ URL="https://raw.githubusercontent.com/KuJyoAi/MyLinux/master/omz/.zshrc"
 curl -o ~/.zshrc-pre $URL
 mv ~/.zshrc ~/.zshrc-bak
 mv ~/.zshrc-pre ~/.zshrc
-
-# 设置 zsh 为默认 shell
-echo "need to set zsh as default shell, and switch to zsh? [Y/n]"
-read -r answer
-if [ -z "$answer" ] || [ "$answer" != "${answer#[Yy]}" ]; then
-    echo "setting zsh as default shell ..."
-    chsh -s /bin/zsh
-    zsh
-    else
-    exit 0
-fi
 
