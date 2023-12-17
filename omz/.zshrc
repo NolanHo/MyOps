@@ -101,7 +101,7 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 # git
-git_help(){
+git_help_func(){
     cat << EOF
 [git help menu]
 gam = git add . && git commit
@@ -115,19 +115,34 @@ gdf = git diff
 gdfc = git diff --cached
 EOF
 }
-alias ghp="git_help"
-alias gam="git add . && git commit"
+alias ghf="git_help_func"
+
+alias ga="git add ."
+alias gc="git commit"
 alias gcm="git commit -m"
+alias gac="git add . && git commit"
+alias gam="git add . && git commit --amend"
+alias gamn="git add . && git commit --amend --no-edit"
+alias grm="git rm --cached"
 alias gpl="git pull"
 alias gps="git push"
-alias gco="git checkout"
-alias gbr="git branch"
+git_push_force(){
+    echo "are you sure to push force? (y/n)"
+    read -r answer
+    if [ "$answer" != "y" ] || [ "$answer" != "Y" ]; then
+        echo "Aborted"
+        return 1
+    fi
+    git push -f
+}
+alias gpf="git_push_force"
 alias gst="git status"
+alias glg="git log"
 alias gdf="git diff"
 alias gdfc="git diff --cached"
 
 # docker
-docker_my_help(){
+docker_help_func(){
     cat << EOF
     [docker]
 dh: docker help
@@ -146,7 +161,7 @@ dclog: docker-compose logs
 dcb: docker-compose build
 EOF
 }
-alias dhp="docker_my_help"
+alias dhf="docker_help_func"
 alias dh="docker --help"
 alias dps="docker ps"
 alias dpsa="docker ps -a"
@@ -162,7 +177,7 @@ alias dclog="docker-compose logs"
 alias dcb="docker-compose build"
 
 # systemctl
-systemctl_help(){
+systemctl_help_func(){
     cat << EOF
 [systemctl]
 scts: systemctl status
@@ -171,11 +186,27 @@ scts: systemctl start
 sctp: systemctl stop
 EOF
 }
-alias scth="systemctl_help"
+alias scthf="systemctl_help_func"
 alias scts="systemctl status"
 alias sctr="systemctl restart"
 alias scts="systemctl start"
 alias sctp="systemctl stop"
+
+# tmux
+tmux_help_func(){
+    cat << EOF
+[tmux]
+tmux: tmux new -s
+tmuxa: tmux attach -t
+tmuxl: tmux list-sessions
+tmuxk: tmux kill-session -t
+EOF
+}
+alias tmuxhf="tmux_help_func"
+alias tmux="tmux new -s"
+alias tmuxa="tmux attach -t"
+alias tmuxl="tmux list-sessions"
+alias tmuxk="tmux kill-session -t"
 
 # 常用脚本:
 my_func_help(){
@@ -192,7 +223,7 @@ killn: kill process by name
 rpwd: generate random password
 EOF
 }
-alias mfhp="my_func_help"
+alias mhpf="my_func_help"
 
 # count_files: 统计当前目录下的文件数量, 可以使用正则表达式过滤
 count_files() {
@@ -209,10 +240,9 @@ count_files() {
 }
 alias cfs=count_files
 
-# scan_port: 检查端口是否被占用
 scan_port() {
   if [ -z "$1" ]; then
-    echo "usage: sport <port or range>"
+    echo "Error: No port provided."
     return 1
   fi
 
@@ -220,23 +250,39 @@ scan_port() {
 
   # 检查输入是否为单个端口
   if [[ $port_range =~ ^[0-9]+$ ]]; then
-    netstat -tuln | grep -w "$port_range"
+    ss -tuln | grep -w ":$port_range"
   # 检查输入是否为端口范围
   elif [[ $port_range =~ ^[0-9]+-[0-9]+$ ]]; then
     local start_port=${port_range%-*}
     local end_port=${port_range#*-}
     for ((port=start_port; port<=end_port; port++)); do
-      netstat -tuln | grep -w "$port"
+      ss -tuln | grep -w ":$port"
     done
   else
-    echo "Error: Invalid port range format. Please provide a single port or a range like 80-443."
+    echo "Error: Invalid port format. Please provide a single port or a range like 80-443."
     return 1
   fi
 
   # 打印进程的PID、协议和状态
-  local pid_protocol_state
-  pid_protocol_state=$(netstat -tulnp | awk '/^tcp/ {print $7 " " $1 " " $6}')
-  echo "$pid_protocol_state"
+  if command -v lsof > /dev/null; then
+    local pid_protocol_state
+    if [[ $port_range =~ ^[0-9]+$ ]]; then
+      pid_protocol_state=$(lsof -iTCP -sTCP:LISTEN -nP | grep -w "TCP\*:$port_range" | grep -v '^$')
+    elif [[ $port_range =~ ^[0-9]+-[0-9]+$ ]]; then
+      # lsof没有直接支持范围查询，因此我们使用循环来查询每个端口
+      for ((port=start_port; port<=end_port; port++)); do
+        tmp=$(lsof -iTCP:$port -sTCP:LISTEN -nP | grep -w "TCP\*:$port" | grep -v '^$')
+        if [ -n "$tmp" ]; then
+          pid_protocol_state+="$tmp"$'\n'
+        fi
+      done
+    fi
+    # 移除最后一个换行符
+    pid_protocol_state=$(echo -n "$pid_protocol_state")
+    echo "$pid_protocol_state"
+  else
+    echo "Error: lsof command is not installed. Install it or use netstat or ss tools."
+  fi
 }
 alias scanp=scan_port
 

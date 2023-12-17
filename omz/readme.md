@@ -1,6 +1,7 @@
-# 安装好zsh的情况下使用
-warning: 请先安装好zsh
+# Oh My Zsh Profile
 
+    先安装好zsh, 然后运行
+    
 ```bash
-wget https://raw.githubusercontent.com/KuJyoAi/MyLinux/master/omz/install.sh -O - | sh
+wget https://raw.githubusercontent.com/KuJyoAi/MyOps/master/omz/install.sh -O - | sh
 ```
