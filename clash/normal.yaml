@@ -10,8 +10,8 @@ proxy-providers:
   PROXY:
     type: http
     # 更换机场只需修改以下两行即可
-    url: "https://api-subscribe.lycoris.cam/api/v1/client/subscribe?token=e3bc9b119812b4413e3c2274e4822855"
-    path: ./ciyy.yml # 机场配置文件保存路径
+    url: ""
+    path: ./fly.yml # 机场配置文件保存路径
     interval: 86400 # 24小时更新一次
     health-check:
       enable: true
