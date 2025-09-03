@@ -15,10 +15,10 @@ fi
 echo "installing oh-my-zsh plugins ... if it takes too long, you can press Ctrl+C to stop it."
 
 # oh-my-zsh 插件
-# syntax-highlighting 高亮
-# check if zsh-syntax-highlighting is installed
+# autosuggestions 自动建议
+# check if zsh-autosuggestions is installed
 if [ ! -d ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions ]; then
-    echo "installing zsh-syntax-highlighting ... if it takes too long, you can press Ctrl+C to stop it."
+    echo "installing zsh-autosuggestions ... if it takes too long, you can press Ctrl+C to stop it."
     git clone https://github.com/zsh-users/zsh-autosuggestions "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
 fi
 
@@ -28,9 +28,9 @@ if [ ! -d ~/.oh-my-zsh/custom/plugins/zsh-completions ]; then
     git clone https://github.com/zsh-users/zsh-completions "$HOME/.oh-my-zsh/custom/plugins/zsh-completions"
 fi
 
-# autosuggestions 自动建议
+# syntax-highlighting 语法高亮
 if [ ! -d ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting ]; then
-    echo "installing zsh-autosuggestions ... if it takes too long, you can press Ctrl+C to stop it."
+    echo "installing zsh-syntax-highlighting ... if it takes too long, you can press Ctrl+C to stop it."
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
 fi
 

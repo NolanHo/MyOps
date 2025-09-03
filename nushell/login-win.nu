@@ -29,7 +29,7 @@ def gac-func [] {
 alias gac = gac-func
 def gam-func [] {
     git add .
-    git commit
+    git commit --amend
 }
 alias gam = gam-func
 def gamn-func [] {
